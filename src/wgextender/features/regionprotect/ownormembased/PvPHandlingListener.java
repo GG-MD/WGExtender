@@ -115,7 +115,7 @@ public class PvPHandlingListener implements Listener {
 		// Block PvP like normal even if the player has an override permission
 		// because (1) this is a frequent source of confusion and
 		// (2) some users want to block PvP even with the bypass permission
-		boolean pvp = event.getEntity() instanceof Player && !playerAttacker.equals(event.getEntity());
+		boolean pvp = event.getEntity() instanceof Player && playerAttacker != null && !playerAttacker.equals(event.getEntity());
 		if (isWhitelisted(event.getCause(), event.getWorld(), pvp)) {
 			return;
 		}
@@ -157,7 +157,7 @@ public class PvPHandlingListener implements Listener {
 					(query.queryState(attackerLocation, localAttacker, combine(event, Flags.PVP)) != State.DENY) &&
 					(query.queryState(target, localAttacker, combine(event, Flags.PVP)) != State.DENY);
 			} else {
-				if (!WGRegionUtils.isInWGRegion(playerAttacker.getLocation()) && !WGRegionUtils.isInWGRegion(event.getTarget())) {
+				if (playerAttacker != null && !WGRegionUtils.isInWGRegion(playerAttacker.getLocation()) && !WGRegionUtils.isInWGRegion(event.getTarget())) {
 					canDamage = true;
 				} else {
 					canDamage =
