@@ -20,6 +20,8 @@ regionprotect:
   explosion:
     block: false
     entity: false
+    excluded-worlds:
+      - "duel"
 autoflags:
   enabled: false
   show-messages: false

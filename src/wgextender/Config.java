@@ -55,6 +55,7 @@ public class Config {
 	public boolean disableBlockBurnInRegion = false;
 	public boolean checkExplosionBlockDamage = false;
 	public boolean checkExplosionEntityDamage = false;
+	public List<String> explosionDamageExcludedWorlds = new ArrayList<>();
 
 	public boolean claimAutoFlagsEnabled = false;
 	public boolean showAutoFlagMessages = false;
@@ -116,6 +117,7 @@ public class Config {
 		disableBlockBurnInRegion = config.getBoolean("regionprotect.fire.burn", disableBlockBurnInRegion);
 		checkExplosionBlockDamage = config.getBoolean("regionprotect.explosion.block", checkExplosionBlockDamage);
 		checkExplosionEntityDamage = config.getBoolean("regionprotect.explosion.entity", checkExplosionEntityDamage);
+		explosionDamageExcludedWorlds = new ArrayList<>(config.getStringList("regionprotect.explosion.excluded-worlds"));
 
 		claimAutoFlagsEnabled = config.getBoolean("autoflags.enabled", claimAutoFlagsEnabled);
 		showAutoFlagMessages = config.getBoolean("autoflags.show-messages", showAutoFlagMessages);

@@ -18,6 +18,7 @@
 package wgextender.features.regionprotect.regionbased;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -47,6 +48,10 @@ public class Explode implements Listener {
 		if (!config.checkExplosionBlockDamage) {
 			return;
 		}
+		World world = event.getLocation().getWorld();
+		if (world != null && config.explosionDamageExcludedWorlds.contains(world.getName())) {
+			return;
+		}
 		Player source = findExplosionSource(event.getEntity());
 		Predicate<Location> shouldProtectBlockPredicate;
 		if (source != null) {
@@ -63,12 +68,20 @@ public class Explode implements Listener {
 		if (!config.checkExplosionBlockDamage) {
 			return;
 		}
+		World world = event.getBlock().getWorld();
+		if (world != null && config.explosionDamageExcludedWorlds.contains(world.getName())) {
+			return;
+		}
 		event.blockList().removeIf(block -> WGRegionUtils.isInWGRegion(block.getLocation()));
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onEntityDamageByExplosion(EntityDamageEvent event) {
 		if (!config.checkExplosionEntityDamage) {
+			return;
+		}
+		World world = event.getEntity().getWorld();
+		if (world != null && config.explosionDamageExcludedWorlds.contains(world.getName())) {
 			return;
 		}
 		if ((event.getCause() == DamageCause.BLOCK_EXPLOSION) || (event.getCause() == DamageCause.ENTITY_EXPLOSION)) {
