@@ -17,7 +17,6 @@
 
 package wgextender.features.regionprotect.ownormembased;
 
-import org.bukkit.Bukkit;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,47 +24,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import wgextender.Config;
-import wgextender.WGExtender;
-import wgextender.utils.CommandUtils;
 import wgextender.utils.WGRegionUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class RestrictCommands implements Listener {
-	private final Pattern SPACE_PATTERN = Pattern.compile("\\s+");
-	private static final long TICK = 1000 / 20;
 
 	protected final Config config;
-	protected volatile Collection<String> restrictedCommands;
 
 	public RestrictCommands(Config config) {
 		this.config = config;
-		restrictedCommands = config.restrictedCommandsInRegion;
-        Bukkit.getAsyncScheduler().runAtFixedRate(
-                WGExtender.getInstance(),
-                (task) -> commandRecheckTask(config),
-                TICK, TICK * 100, TimeUnit.MILLISECONDS
-        );
-	}
-
-	private void commandRecheckTask(Config config) {
-		if (!config.restrictCommandsInRegionEnabled) {
-			return;
-		}
-		Set<String> computedRestrictedCommands = new HashSet<>();
-		for (String restrictedCommand : config.restrictedCommandsInRegion) {
-			String[] split = SPACE_PATTERN.split(restrictedCommand, 2);
-			String toAdd = split.length > 1 ? split[1] : "";
-			for (String alias : CommandUtils.getCommandAliases(split[0].toLowerCase(Locale.ROOT))) {
-				computedRestrictedCommands.add(alias + toAdd);
-			}
-		}
-		restrictedCommands = computedRestrictedCommands;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -79,8 +47,9 @@ public class RestrictCommands implements Listener {
 		}
 		if (WGRegionUtils.isInWGRegion(player.getLocation()) && !WGRegionUtils.canBuild(player, player.getLocation())) {
 			String command = event.getMessage().substring(1).toLowerCase(Locale.ROOT);
-			for (String rcommand : restrictedCommands) {
-				if (command.startsWith(rcommand) && (command.length() == rcommand.length() || command.charAt(rcommand.length()) == ' ')) {
+			for (String rcommand : config.restrictedCommandsInRegion) {
+				if (command.startsWith(rcommand.toLowerCase(Locale.ROOT)) && 
+					(command.length() == rcommand.length() || command.charAt(rcommand.length()) == ' ')) {
 					event.setCancelled(true);
 					player.sendMessage(NamedTextColor.RED + "Вы не можете использовать эту команду в чужом регионе");
 					return;
