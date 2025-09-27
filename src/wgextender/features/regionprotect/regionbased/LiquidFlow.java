@@ -17,15 +17,19 @@
 
 package wgextender.features.regionprotect.regionbased;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
@@ -49,8 +53,34 @@ public class LiquidFlow implements Listener {
 		BlockData blockData = block.getBlockData();
 		if (blockData instanceof Directional directional) {
 			Block relative = block.getRelative(directional.getFacing());
+			
 			if (relative.isLiquid()) {
 				check(block, relative, event, false);
+			}
+			
+			ItemStack item = event.getItem();
+			if (isLiquidBucket(item.getType())) {
+				Material liquidType = getLiquidFromBucket(item.getType());
+				if (shouldCheckLiquid(liquidType)) {
+					if (!WGRegionUtils.isInTheSameRegionOrWild(block.getLocation(), relative.getLocation())) {
+						event.setCancelled(true);
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onBlockPlace(BlockPlaceEvent event) {
+		Block block = event.getBlock();
+		BlockData blockData = block.getBlockData();
+		
+		if (blockData instanceof Waterlogged waterlogged && waterlogged.isWaterlogged()) {
+			if (config.checkWaterFlow) {
+				Block sourceBlock = event.getBlockAgainst();
+				if (!WGRegionUtils.isInTheSameRegionOrWild(sourceBlock.getLocation(), block.getLocation())) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -65,6 +95,31 @@ public class LiquidFlow implements Listener {
 				event.setCancelled(true);
 			}
 		}
+	}
+
+	private boolean isLiquidBucket(Material material) {
+		return material.name().endsWith("_BUCKET") && material != Material.BUCKET;
+	}
+
+	private Material getLiquidFromBucket(Material bucketType) {
+		String bucketName = bucketType.name();
+		if (bucketName.endsWith("_BUCKET") && !bucketName.equals("BUCKET")) {
+			String liquidName = bucketName.replace("_BUCKET", "");
+			try {
+				return Material.valueOf(liquidName);
+			} catch (IllegalArgumentException e) {
+				return Material.AIR;
+			}
+		}
+		return Material.AIR;
+	}
+
+	private boolean shouldCheckLiquid(Material liquidType) {
+		return switch (liquidType) {
+			case LAVA -> config.checkLavaFlow;
+			case WATER -> config.checkWaterFlow;
+			default -> config.checkOtherLiquidFlow;
+		};
 	}
 
 }
