@@ -25,9 +25,55 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.util.Vector;
 import wgextender.utils.WGRegionUtils;
 
 public class MinecartProtection implements Listener {
+	
+	private boolean isNearRegion(Location location) {
+		for (int x = -2; x <= 2; x++) {
+			for (int y = -2; y <= 2; y++) {
+				for (int z = -2; z <= 2; z++) {
+					if (x == 0 && y == 0 && z == 0) {
+						continue;
+					}
+					
+					Location checkLocation = location.clone().add(x, y, z);
+					if (WGRegionUtils.isInWGRegion(checkLocation)) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	private Location findNearestRegionCenter(Location location) {
+		Location nearestCenter = null;
+		double nearestDistance = Double.MAX_VALUE;
+		
+		for (int x = -2; x <= 2; x++) {
+			for (int y = -2; y <= 2; y++) {
+				for (int z = -2; z <= 2; z++) {
+					if (x == 0 && y == 0 && z == 0) {
+						continue;
+					}
+					
+					Location checkLocation = location.clone().add(x, y, z);
+					if (WGRegionUtils.isInWGRegion(checkLocation)) {
+						double distance = location.distance(checkLocation);
+						if (distance < nearestDistance) {
+							nearestDistance = distance;
+							nearestCenter = checkLocation;
+						}
+					}
+				}
+			}
+		}
+		
+		return nearestCenter;
+	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onVehicleMove(VehicleMoveEvent event) {
@@ -42,7 +88,12 @@ public class MinecartProtection implements Listener {
 			return;
 		}
 
-		if (!WGRegionUtils.isInWGRegion(from) && WGRegionUtils.isInWGRegion(to)) {
+		boolean fromInRegion = WGRegionUtils.isInWGRegion(from);
+		boolean toInRegion = WGRegionUtils.isInWGRegion(to);
+		boolean fromNearRegion = isNearRegion(from);
+		boolean toNearRegion = isNearRegion(to);
+
+		if ((!fromInRegion && !fromNearRegion) && (toInRegion || toNearRegion)) {
 			if (!minecart.isEmpty()) {
 				Entity passenger = minecart.getPassengers().get(0);
 				if (passenger instanceof Player player) {
@@ -52,7 +103,30 @@ public class MinecartProtection implements Listener {
 				}
 			}
 			
-			minecart.setVelocity(minecart.getVelocity().multiply(-1));
+			Location regionCenter = findNearestRegionCenter(from);
+			if (regionCenter != null) {
+				Vector direction = from.toVector().subtract(regionCenter.toVector()).normalize();
+				minecart.setVelocity(direction.multiply(2.0));
+			} else {
+				minecart.setVelocity(minecart.getVelocity().multiply(-2));
+			}
+		} else if (fromNearRegion && !fromInRegion) {
+			if (!minecart.isEmpty()) {
+				Entity passenger = minecart.getPassengers().get(0);
+				if (passenger instanceof Player player) {
+					if (WGRegionUtils.canBypassProtection(player)) {
+						return;
+					}
+				}
+			}
+			
+			Location regionCenter = findNearestRegionCenter(from);
+			if (regionCenter != null) {
+				Vector direction = from.toVector().subtract(regionCenter.toVector()).normalize();
+				minecart.setVelocity(direction.multiply(2.0));
+			} else {
+				minecart.setVelocity(minecart.getVelocity().multiply(-2));
+			}
 		}
 	}
 
