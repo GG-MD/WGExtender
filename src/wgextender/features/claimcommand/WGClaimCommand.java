@@ -15,7 +15,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import wgextender.utils.WEUtils;
@@ -81,9 +81,9 @@ public class WGClaimCommand {
 		task.setOwnersInput(new String[] { player.getName() });
 		try {
 			task.call();
-			sender.sendMessage(ChatColor.YELLOW + "Вы заприватили регион "+id);
+			sender.sendMessage(NamedTextColor.YELLOW + "Вы заприватили регион "+id);
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.YELLOW + "Произошла ошибка при привате региона "+id);
+			sender.sendMessage(NamedTextColor.YELLOW + "Произошла ошибка при привате региона "+id);
 			e.printStackTrace();
 		}
 	}

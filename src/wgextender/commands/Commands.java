@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -47,8 +48,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.bukkit.ChatColor.BLUE;
-import static org.bukkit.ChatColor.RED;
 import static org.bukkit.util.StringUtil.copyPartialMatches;
 
 //TODO: refactor
@@ -72,22 +71,22 @@ public class Commands implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command arg1, String label, String[] args) {
 		if (!sender.hasPermission("wgextender.admin")) {
-			sender.sendMessage(RED + "Недостаточно прав");
+			sender.sendMessage(NamedTextColor.RED + "Недостаточно прав");
 			return true;
 		}
 		if (args.length >= 1) {
 			switch (args[0].toLowerCase()) {
 				case "help" -> {
-					sender.sendMessage(BLUE + "wgex reload - перезагрузить конфиг");
-					sender.sendMessage(BLUE + "wgex search - ищет регионы в выделенной области");
-					sender.sendMessage(BLUE + "wgex setflag {world} {flag} {value}  - устанавливает флаг {flag} со значением {value} на все регионы в мире {world}");
-					sender.sendMessage(BLUE + "wgex removeowner {name} - удаляет игрока из списков владельцев всех регионов");
-					sender.sendMessage(BLUE + "wgex removemember {name} - удаляет игрока из списков членов всех регионов");
+					sender.sendMessage(NamedTextColor.BLUE + "wgex reload - перезагрузить конфиг");
+					sender.sendMessage(NamedTextColor.BLUE + "wgex search - ищет регионы в выделенной области");
+					sender.sendMessage(NamedTextColor.BLUE + "wgex setflag {world} {flag} {value}  - устанавливает флаг {flag} со значением {value} на все регионы в мире {world}");
+					sender.sendMessage(NamedTextColor.BLUE + "wgex removeowner {name} - удаляет игрока из списков владельцев всех регионов");
+					sender.sendMessage(NamedTextColor.BLUE + "wgex removemember {name} - удаляет игрока из списков членов всех регионов");
 					return true;
 				}
 				case "reload" -> {
 					config.loadConfig();
-					sender.sendMessage(BLUE + "Конфиг перезагружен");
+					sender.sendMessage(NamedTextColor.BLUE + "Конфиг перезагружен");
 					return true;
 				}
 				case "search" -> {
@@ -95,12 +94,12 @@ public class Commands implements CommandExecutor, TabCompleter {
 						try {
 							List<String> regions = getRegionsInPlayerSelection(player);
 							if (regions.isEmpty()) {
-								sender.sendMessage(BLUE + "Регионов пересекающихся с выделенной зоной не найдено");
+								sender.sendMessage(NamedTextColor.BLUE + "Регионов пересекающихся с выделенной зоной не найдено");
 							} else {
-								sender.sendMessage(BLUE + "Найдены регионы пересекающиеся с выделенной зоной: " + regions);
+								sender.sendMessage(NamedTextColor.BLUE + "Найдены регионы пересекающиеся с выделенной зоной: " + regions);
 							}
 						} catch (IncompleteRegionException e) {
-							sender.sendMessage(BLUE + "Сначала выделите зону поиска");
+							sender.sendMessage(NamedTextColor.BLUE + "Сначала выделите зону поиска");
 						}
 						return true;
 					}
@@ -112,12 +111,12 @@ public class Commands implements CommandExecutor, TabCompleter {
 					}
 					World world = Bukkit.getWorld(args[1]);
 					if (world == null) {
-						sender.sendMessage(BLUE + "Мир не найден");
+						sender.sendMessage(NamedTextColor.BLUE + "Мир не найден");
 						return true;
 					}
 					Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[2]);
 					if (flag == null) {
-						sender.sendMessage(BLUE + "Флаг не найден");
+						sender.sendMessage(NamedTextColor.BLUE + "Флаг не найден");
 						return true;
 					}
 					try {
@@ -128,9 +127,9 @@ public class Commands implements CommandExecutor, TabCompleter {
 							}
 							AutoFlags.setFlag(WGRegionUtils.wrapAsPrivileged(sender, false), world, region, flag, value);
 						}
-						sender.sendMessage(BLUE + "Флаги установлены");
+						sender.sendMessage(NamedTextColor.BLUE + "Флаги установлены");
 					} catch (CommandException e) {
-						sender.sendMessage(BLUE + "Неправильный формат флага " + flag.getName() + ": " + e.getMessage());
+						sender.sendMessage(NamedTextColor.BLUE + "Неправильный формат флага " + flag.getName() + ": " + e.getMessage());
 					}
 					return true;
 				}
@@ -150,7 +149,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 							region.setMembers(members);
 						}
 					}
-					sender.sendMessage(BLUE + "Игрок удалён из списков " + (owner ? "владельцев" : "участников") + " всех регионов");
+					sender.sendMessage(NamedTextColor.BLUE + "Игрок удалён из списков " + (owner ? "владельцев" : "участников") + " всех регионов");
 					return true;
 				}
 			}

@@ -17,7 +17,7 @@
 
 package wgextender.features.extendedwand;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -52,7 +52,7 @@ public class WEWandCommandWrapper extends Command {
 		}
 		if (sender instanceof Player player) {
 			player.getInventory().addItem(WEWand.getWand());
-			player.sendMessage(ChatColor.LIGHT_PURPLE+"Выдана вещь для выделения территории");
+			player.sendMessage(NamedTextColor.LIGHT_PURPLE+"Выдана вещь для выделения территории");
 		}
 		return true;
 	}
