@@ -51,7 +51,7 @@ public class RestrictCommands implements Listener {
 				if (command.startsWith(rcommand.toLowerCase(Locale.ROOT)) && 
 					(command.length() == rcommand.length() || command.charAt(rcommand.length()) == ' ')) {
 					event.setCancelled(true);
-					player.sendMessage(ColorUtil.deserialize("<dark_gray>[<red><b>!<dark_gray>] <gray>Вы не можете использовать эту команду в чужом регионе."));
+					player.sendMessage(ColorUtil.deserialize("<dark_gray>[<red><b>!</b><dark_gray>] <gray>Вы не можете использовать эту команду в чужом регионе."));
 					return;
 				}
 			}
