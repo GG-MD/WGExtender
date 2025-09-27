@@ -24,9 +24,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
+
+import wgextender.utils.ColorUtil;
 import wgextender.utils.WGRegionUtils;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.LocalPlayer;
 
 public class MinecartProtection implements Listener {
 	
@@ -73,6 +81,69 @@ public class MinecartProtection implements Listener {
 		}
 		
 		return nearestCenter;
+	}
+	
+	private boolean isPlayerOwnerOrMember(Player player, Location location) {
+		if (WGRegionUtils.canBypassProtection(player)) {
+			return true;
+		}
+		
+		ApplicableRegionSet regions = WGRegionUtils.getRegionsAt(location);
+		if (regions.size() == 0) {
+			for (int x = -2; x <= 2; x++) {
+				for (int y = -2; y <= 2; y++) {
+					for (int z = -2; z <= 2; z++) {
+						if (x == 0 && y == 0 && z == 0) {
+							continue;
+						}
+						
+						Location checkLocation = location.clone().add(x, y, z);
+						ApplicableRegionSet nearbyRegions = WGRegionUtils.getRegionsAt(checkLocation);
+						if (nearbyRegions.size() > 0) {
+							LocalPlayer localPlayer = WGRegionUtils.wrapPlayer(player);
+							return nearbyRegions.isOwnerOfAll(localPlayer) || nearbyRegions.isMemberOfAll(localPlayer);
+						}
+					}
+				}
+			}
+			return true;
+		}
+		
+		LocalPlayer localPlayer = WGRegionUtils.wrapPlayer(player);
+		return regions.isOwnerOfAll(localPlayer) || regions.isMemberOfAll(localPlayer);
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+			return;
+		}
+		
+		ItemStack item = event.getItem();
+		if (item == null || !isMinecartItem(item.getType())) {
+			return;
+		}
+		
+		Player player = event.getPlayer();
+		Location clickedLocation = event.getClickedBlock().getLocation();
+		
+		for (int y = 0; y >= -2; y--) {
+			Location checkLocation = clickedLocation.clone().add(0, y, 0);
+			boolean inRegion = WGRegionUtils.isInWGRegion(checkLocation);
+			boolean nearRegion = isNearRegion(checkLocation);
+			
+			if (inRegion || nearRegion) {
+				if (!isPlayerOwnerOrMember(player, checkLocation)) {
+					event.setCancelled(true);
+					player.sendMessage(ColorUtil.deserialize("<dark_gray>[<red><b>!</b><dark_gray>] <gray>Запрещено размещать вагонетки рядом с чужим регионом!"));
+					return;
+				}
+			}
+		}
+	}
+	
+	private boolean isMinecartItem(Material material) {
+		return material.name().endsWith("_MINECART");
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
