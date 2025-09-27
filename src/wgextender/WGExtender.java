@@ -34,6 +34,7 @@ import wgextender.features.regionprotect.regionbased.Explode;
 import wgextender.features.regionprotect.regionbased.FireSpread;
 import wgextender.features.regionprotect.regionbased.HopperProtection;
 import wgextender.features.regionprotect.regionbased.LiquidFlow;
+import wgextender.features.regionprotect.regionbased.MinecartProtection;
 
 import java.util.Objects;
 import java.util.logging.Level;
@@ -69,7 +70,8 @@ public class WGExtender extends JavaPlugin {
 		pluginManager.registerEvents(new FireSpread(config), this);
 		pluginManager.registerEvents(new BlockBurn(config), this);
 		pluginManager.registerEvents(new Explode(config), this);
-		pluginManager.registerEvents(new HopperProtection(config), this);
+		pluginManager.registerEvents(new HopperProtection(), this);
+		pluginManager.registerEvents(new MinecartProtection(), this);
 		pluginManager.registerEvents(new WEWandListener(), this);
 		pluginManager.registerEvents(new ChorusFruitFlagHandler(), this);
 		try {

@@ -27,15 +27,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
 public class HopperProtection implements Listener {
-
-	protected final Config config;
-	public HopperProtection(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onInventoryMoveItem(InventoryMoveItemEvent event) {
