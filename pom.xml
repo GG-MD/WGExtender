@@ -6,7 +6,7 @@
 
     <groupId>org.hurricanegames</groupId>
     <artifactId>wgextender</artifactId>
-    <version>3.2.0-fork-SNAPSHOT</version>
+    <version>3.3.0</version>
     <packaging>jar</packaging>
 
     <name>WGExtender</name>
@@ -61,13 +61,13 @@
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
+            <version>1.7.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.13</version>
+            <version>7.0.14</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>7.3.10</version>
+            <version>7.3.16</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
