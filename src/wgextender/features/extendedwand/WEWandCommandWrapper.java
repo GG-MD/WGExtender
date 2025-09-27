@@ -17,11 +17,11 @@
 
 package wgextender.features.extendedwand;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import wgextender.Config;
+import wgextender.utils.ColorUtil;
 import wgextender.utils.CommandUtils;
 
 public class WEWandCommandWrapper extends Command {
@@ -52,7 +52,7 @@ public class WEWandCommandWrapper extends Command {
 		}
 		if (sender instanceof Player player) {
 			player.getInventory().addItem(WEWand.getWand());
-			player.sendMessage(NamedTextColor.LIGHT_PURPLE+"Выдана вещь для выделения территории");
+			player.sendMessage(ColorUtil.deserialize("<light_purple>Выдана вещь для выделения территории"));
 		}
 		return true;
 	}

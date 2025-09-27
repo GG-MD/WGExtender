@@ -17,13 +17,13 @@
 
 package wgextender.features.regionprotect.ownormembased;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import wgextender.Config;
+import wgextender.utils.ColorUtil;
 import wgextender.utils.WGRegionUtils;
 
 import java.util.Locale;
@@ -51,7 +51,7 @@ public class RestrictCommands implements Listener {
 				if (command.startsWith(rcommand.toLowerCase(Locale.ROOT)) && 
 					(command.length() == rcommand.length() || command.charAt(rcommand.length()) == ' ')) {
 					event.setCancelled(true);
-					player.sendMessage(NamedTextColor.RED + "Вы не можете использовать эту команду в чужом регионе");
+					player.sendMessage(ColorUtil.deserialize("<dark_gray>[<red><b>!<dark_gray>] <gray>Вы не можете использовать эту команду в чужом регионе."));
 					return;
 				}
 			}

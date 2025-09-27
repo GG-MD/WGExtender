@@ -1,11 +1,11 @@
 package wgextender.features.flags;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import wgextender.utils.ColorUtil;
 import wgextender.utils.WGRegionUtils;
 
 public class ChorusFruitFlagHandler implements Listener {
@@ -18,7 +18,7 @@ public class ChorusFruitFlagHandler implements Listener {
 				!WGRegionUtils.canBypassProtection(event.getPlayer()) &&
 				!WGRegionUtils.isFlagAllows(player, player.getLocation(), WGExtenderFlags.CHORUS_FRUIT_USE_FLAG)
 			) {
-				player.sendMessage(NamedTextColor.RED + "Вы не можете использовать хорус в этом регионе");
+				player.sendMessage(ColorUtil.deserialize("<red>Вы не можете использовать хорус в этом регионе"));
 				event.setCancelled(true);
 			}
 		}

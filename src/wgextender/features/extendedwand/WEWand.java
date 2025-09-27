@@ -18,14 +18,14 @@
 package wgextender.features.extendedwand;
 
 import org.bukkit.Bukkit;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import wgextender.utils.ColorUtil;
 import wgextender.utils.WEUtils;
 
 public class WEWand { // TODO Use PersistentData API
-	protected static final String WAND_NAME = NamedTextColor.LIGHT_PURPLE + "Selection wand";
+	protected static final String WAND_NAME = ColorUtil.serialize(ColorUtil.deserialize("<light_purple>Selection wand"));
 
 	protected static Material cachedWandMaterial;
 
