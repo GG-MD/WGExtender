@@ -24,6 +24,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -31,9 +33,9 @@ import java.util.*;
 
 public class Config {
 
-	private final Plugin plugin;
-	protected final File configFile;
-	public Config(WGExtender plugin) {
+	private final @NotNull Plugin plugin;
+	protected final @NotNull File configFile;
+	public Config(@NotNull WGExtender plugin) {
 		this.plugin = plugin;
 		configFile = new File(plugin.getDataFolder(), "config.yml");
 	}
@@ -66,7 +68,7 @@ public class Config {
 
 	public boolean extendedWorldEditWandEnabled = false;
 
-	public Boolean miscDefaultPvPFlagOperationMode = null;
+	public @Nullable Boolean miscDefaultPvPFlagOperationMode = null;
 
 	public boolean miscOldPvpFlags = true;
 
@@ -145,7 +147,7 @@ public class Config {
 		} else {
 			miscDefaultPvPFlagOperationMode = null;
 		}
-		miscOldPvpFlags = config.getBoolean("misc.old-pvp-flags");
+		miscOldPvpFlags = config.getBoolean("misc.old-pvp-flags", miscOldPvpFlags);
 	}
 
 	private static BigInteger asBig(ConfigurationSection section, String key) {
