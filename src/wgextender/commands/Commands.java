@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -51,13 +52,10 @@ import java.util.stream.StreamSupport;
 import static org.bukkit.util.StringUtil.copyPartialMatches;
 
 //TODO: refactor
+@RequiredArgsConstructor
 public class Commands implements CommandExecutor, TabCompleter {
 
 	protected final Config config;
-
-	public Commands(Config config) {
-		this.config = config;
-	}
 
 	private static List<String> getRegionsInPlayerSelection(Player player) throws IncompleteRegionException {
 		Region psel = WEUtils.getSelection(player);

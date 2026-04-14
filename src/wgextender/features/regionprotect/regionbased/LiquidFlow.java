@@ -17,6 +17,7 @@
 
 package wgextender.features.regionprotect.regionbased;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -33,12 +34,10 @@ import org.bukkit.inventory.ItemStack;
 import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
+@RequiredArgsConstructor
 public class LiquidFlow implements Listener {
 
 	protected final Config config;
-	public LiquidFlow(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onLiquidFlow(BlockFromToEvent event) {

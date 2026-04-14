@@ -17,6 +17,7 @@
 
 package wgextender.features.regionprotect.regionbased;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Creeper;
@@ -36,12 +37,10 @@ import wgextender.utils.WGRegionUtils;
 
 import java.util.function.Predicate;
 
+@RequiredArgsConstructor
 public class Explode implements Listener {
 
 	protected final Config config;
-	public Explode(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onEntityExplode(EntityExplodeEvent event) {

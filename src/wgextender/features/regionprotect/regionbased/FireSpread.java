@@ -17,6 +17,7 @@
 
 package wgextender.features.regionprotect.regionbased;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,12 +26,10 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
+@RequiredArgsConstructor
 public class FireSpread implements Listener {
 
 	protected final Config config;
-	public FireSpread(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onBlockIgniteBySpread(BlockSpreadEvent event) {

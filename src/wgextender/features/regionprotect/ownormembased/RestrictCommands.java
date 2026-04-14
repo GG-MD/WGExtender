@@ -17,6 +17,7 @@
 
 package wgextender.features.regionprotect.ownormembased;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,13 +29,10 @@ import wgextender.utils.WGRegionUtils;
 
 import java.util.Locale;
 
+@RequiredArgsConstructor
 public class RestrictCommands implements Listener {
 
 	protected final Config config;
-
-	public RestrictCommands(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {

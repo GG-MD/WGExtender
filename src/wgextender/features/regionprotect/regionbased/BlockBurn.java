@@ -17,6 +17,7 @@
 
 package wgextender.features.regionprotect.regionbased;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,12 +25,10 @@ import org.bukkit.event.block.BlockBurnEvent;
 import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
+@RequiredArgsConstructor
 public class BlockBurn implements Listener {
 
 	protected final Config config;
-	public BlockBurn(Config config) {
-		this.config = config;
-	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onBlockBurn(BlockBurnEvent event) {
