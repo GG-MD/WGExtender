@@ -20,7 +20,9 @@ package wgextender.features.claimcommand;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wgextender.Config;
 import wgextender.VaultIntegration;
 import wgextender.utils.WEUtils;
@@ -30,7 +32,7 @@ import java.math.BigInteger;
 public class BlockLimits {
 	private static final BigInteger MAX_VALUE = BigInteger.valueOf(Integer.MAX_VALUE);
 
-	public ProcessedClaimInfo processClaimInfo(Config config, Player player) {
+	public @NotNull ProcessedClaimInfo processClaimInfo(@NotNull Config config, @NotNull Player player) {
 		Region selection;
 		try {
 			selection = WEUtils.getSelection(player);
@@ -81,8 +83,12 @@ public class BlockLimits {
 						config.claimBlockMinimalVertical
 				);
 			}
-			String[] groups = VaultIntegration.getInstance().getPermissions().getPlayerGroups(player);
-			if (groups.length == 0) {
+			Permission permissions = VaultIntegration.getInstance().getPermissions();
+			if (permissions == null) {
+				return ProcessedClaimInfo.EMPTY_ALLOW;
+			}
+			String[] groups = permissions.getPlayerGroups(player);
+			if (groups == null || groups.length == 0) {
 				return ProcessedClaimInfo.EMPTY_ALLOW;
 			}
 			BigInteger maxBlocks = config.claimBlockLimitDefault;
