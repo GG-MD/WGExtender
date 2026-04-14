@@ -36,12 +36,13 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wgextender.Config;
 import wgextender.utils.WGRegionUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static wgextender.utils.WGRegionUtils.getWorldConfig;
 
@@ -58,13 +59,13 @@ public class PvPHandlingListener implements Listener {
 	private static final String DENY_MESSAGE_KEY = "worldguard.region.lastMessage";
 	private static final int LAST_MESSAGE_DELAY = 500;
 
-	private RegisteredListener origin;
+	private @Nullable RegisteredListener origin;
 
-	public PvPHandlingListener(Config config) {
+	public PvPHandlingListener(@NotNull Config config) {
 		this.config = config;
 	}
 
-	public void inject(Plugin plugin) {
+	public void inject(@NotNull Plugin plugin) {
         if (config.miscDefaultPvPFlagOperationMode == null) {
             plugin.getLogger().info(
                     "misc.pvpmode is set to default. Changing it post-initialization will require server " +
@@ -85,7 +86,9 @@ public class PvPHandlingListener implements Listener {
 				break;
 			}
 		}
-		Objects.requireNonNull(origin, "Couldn't find the original RegionProtectionListener");
+		if (origin == null) {
+			throw new IllegalStateException("Couldn't find the original WorldGuard RegionProtectionListener");
+		}
 		handlers.unregister(origin);
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}

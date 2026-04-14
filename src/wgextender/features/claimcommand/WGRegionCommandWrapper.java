@@ -21,6 +21,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wgextender.Config;
 import wgextender.utils.ColorUtil;
 import wgextender.utils.CommandUtils;
@@ -29,20 +30,26 @@ import wgextender.utils.WGRegionUtils;
 
 public class WGRegionCommandWrapper extends Command {
 
-	public static void inject(Config config) {
-		WGRegionCommandWrapper wrapper = new WGRegionCommandWrapper(config, CommandUtils.getCommands().get("region"));
-		CommandUtils.replaceCommand(wrapper.originalCmd, wrapper);
+	public static void inject(@NotNull Config config) {
+		Command original = CommandUtils.getCommands().get("region");
+		if (original == null) {
+			throw new IllegalStateException("WorldGuard command 'region' not found — is WorldGuard loaded?");
+		}
+		WGRegionCommandWrapper wrapper = new WGRegionCommandWrapper(config, original);
+		CommandUtils.replaceCommand(original, wrapper);
 	}
 
 	public static void uninject() {
-		WGRegionCommandWrapper wrapper = (WGRegionCommandWrapper) CommandUtils.getCommands().get("region");
-		CommandUtils.replaceCommand(wrapper, wrapper.originalCmd);
+		Command current = CommandUtils.getCommands().get("region");
+		if (current instanceof WGRegionCommandWrapper wrapper) {
+			CommandUtils.replaceCommand(wrapper, wrapper.originalCmd);
+		}
 	}
 
 	protected final Config config;
 	protected final Command originalCmd;
 
-	protected WGRegionCommandWrapper(Config config, Command originalCmd) {
+	protected WGRegionCommandWrapper(@NotNull Config config, @NotNull Command originalCmd) {
 		super(originalCmd.getName(), originalCmd.getDescription(), originalCmd.getUsage(), originalCmd.getAliases());
 		this.config = config;
 		this.originalCmd = originalCmd;
@@ -51,11 +58,11 @@ public class WGRegionCommandWrapper extends Command {
 	private final BlockLimits blockLimits = new BlockLimits();
 
 	@Override
-	public boolean execute(CommandSender sender, String label, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
 		if ((sender instanceof Player player) && (args.length >= 2) && args[0].equalsIgnoreCase("claim")) {
             String regionName = args[1];
 			if (config.claimExpandSelectionVertical) {
-				boolean result = WEUtils.expandVert((Player) sender);
+				boolean result = WEUtils.expandVert(player);
 				if (result) {
 					player.sendMessage(ColorUtil.deserialize("<yellow>Регион автоматически расширен по вертикали"));
 				}

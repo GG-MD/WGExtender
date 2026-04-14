@@ -20,6 +20,8 @@ package wgextender;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wgextender.commands.Commands;
 import wgextender.features.claimcommand.WGRegionCommandWrapper;
 import wgextender.features.extendedwand.WEWandCommandWrapper;
@@ -40,16 +42,19 @@ import java.util.logging.Level;
 public class WGExtender extends JavaPlugin {
 
 	private static WGExtender instance;
-	public static WGExtender getInstance() {
-		return instance;
+
+	public static @NotNull WGExtender getInstance() {
+		return Objects.requireNonNull(instance, "WGExtender is not initialized");
 	}
 
 	public WGExtender() {
 		instance = this;
 	}
 
-	private PvPHandlingListener pvplistener;
-	private OldPVPFlagsHandler oldpvphandler;
+	private @Nullable PvPHandlingListener pvplistener;
+	private @Nullable OldPVPFlagsHandler oldpvphandler;
+	private boolean wgRegionInjected;
+	private boolean weWandInjected;
 
 	@Override
 	public void onLoad() {
@@ -61,7 +66,7 @@ public class WGExtender extends JavaPlugin {
 		VaultIntegration.getInstance().initialize(this);
 		Config config = new Config(this);
 		config.loadConfig();
-		Objects.requireNonNull(getCommand("wgex")).setExecutor(new Commands(config));
+		Objects.requireNonNull(getCommand("wgex"), "command 'wgex' missing in plugin.yml").setExecutor(new Commands(config));
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(new RestrictCommands(config), this);
 		pluginManager.registerEvents(new LiquidFlow(config), this);
@@ -72,7 +77,9 @@ public class WGExtender extends JavaPlugin {
 		pluginManager.registerEvents(new ChorusFruitFlagHandler(), this);
 		try {
 			WGRegionCommandWrapper.inject(config);
+			wgRegionInjected = true;
 			WEWandCommandWrapper.inject(config);
+			weWandInjected = true;
 			pvplistener = new PvPHandlingListener(config);
 			pvplistener.inject(this);
 			oldpvphandler = new OldPVPFlagsHandler();
@@ -85,8 +92,8 @@ public class WGExtender extends JavaPlugin {
 				oldpvphandler.start(this);
 			}
 		} catch (Throwable t) {
-			getLogger().log(Level.SEVERE, "Unable to inject, shutting down", t);
-			t.printStackTrace();
+			getLogger().log(Level.SEVERE, "Unable to inject, rolling back and shutting down", t);
+			safeUninjectAll();
 			Bukkit.shutdown();
 		}
 	}
@@ -94,13 +101,45 @@ public class WGExtender extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		try {
-			WEWandCommandWrapper.uninject();
-			WGRegionCommandWrapper.uninject();
-			pvplistener.uninject();
-			oldpvphandler.stop(this);
+			safeUninjectAll();
 		} catch (Throwable t) {
-			getLogger().log(Level.SEVERE, "Unable to uninject, shutting down", t);
+			getLogger().log(Level.SEVERE, "Unable to uninject cleanly, shutting down", t);
 			Bukkit.shutdown();
+		}
+	}
+
+	private void safeUninjectAll() {
+		if (oldpvphandler != null) {
+			try {
+				oldpvphandler.stop(this);
+			} catch (Throwable t) {
+				getLogger().log(Level.SEVERE, "Failed to stop OldPVPFlagsHandler", t);
+			}
+			oldpvphandler = null;
+		}
+		if (pvplistener != null) {
+			try {
+				pvplistener.uninject();
+			} catch (Throwable t) {
+				getLogger().log(Level.SEVERE, "Failed to uninject PvPHandlingListener", t);
+			}
+			pvplistener = null;
+		}
+		if (weWandInjected) {
+			try {
+				WEWandCommandWrapper.uninject();
+			} catch (Throwable t) {
+				getLogger().log(Level.SEVERE, "Failed to uninject WEWandCommandWrapper", t);
+			}
+			weWandInjected = false;
+		}
+		if (wgRegionInjected) {
+			try {
+				WGRegionCommandWrapper.uninject();
+			} catch (Throwable t) {
+				getLogger().log(Level.SEVERE, "Failed to uninject WGRegionCommandWrapper", t);
+			}
+			wgRegionInjected = false;
 		}
 	}
 

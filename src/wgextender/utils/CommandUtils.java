@@ -19,6 +19,7 @@ package wgextender.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,34 +28,33 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class CommandUtils {
-	public static Map<String, Command> getCommands() {
+	public static @NotNull Map<String, Command> getCommands() {
 		return Bukkit.getCommandMap().getKnownCommands();
 	}
 
-	public static List<String> getCommandAliases(String commandName) {
+	public static @NotNull List<String> getCommandAliases(@NotNull String commandName) {
 		Command command = getCommands().get(commandName);
 		if (command == null) {
 			return Collections.singletonList(commandName);
-		} else {
-			List<String> aliases = new ArrayList<>();
-			aliases.add(commandName);
-			for (Entry<String, Command> entry : getCommands().entrySet()) {
-				if (entry.getValue().equals(command)) {
-					aliases.add(entry.getKey());
-				}
-			}
-			return aliases;
 		}
+		List<String> aliases = new ArrayList<>();
+		aliases.add(commandName);
+		for (Entry<String, Command> entry : getCommands().entrySet()) {
+			if (entry.getValue().equals(command)) {
+				aliases.add(entry.getKey());
+			}
+		}
+		return aliases;
 	}
 
-	public static void replaceCommand(Command oldCommand, Command newCommand) {
+	public static void replaceCommand(@NotNull Command oldCommand, @NotNull Command newCommand) {
+		Map<String, Command> commandMap = getCommands();
 		String cmdName = oldCommand.getName();
-		var commandMap = getCommands();
-		if (commandMap.get(cmdName).equals(oldCommand)) {
+		if (oldCommand.equals(commandMap.get(cmdName))) {
 			commandMap.put(cmdName, newCommand);
 		}
 		for (String alias : oldCommand.getAliases()) {
-			if (commandMap.get(alias).equals(oldCommand)) {
+			if (oldCommand.equals(commandMap.get(alias))) {
 				commandMap.put(alias, newCommand);
 			}
 		}

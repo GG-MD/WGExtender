@@ -20,33 +20,40 @@ package wgextender.features.extendedwand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import wgextender.Config;
 import wgextender.utils.ColorUtil;
 import wgextender.utils.CommandUtils;
 
 public class WEWandCommandWrapper extends Command {
 
-	public static void inject(Config config) {
-		WEWandCommandWrapper wrapper = new WEWandCommandWrapper(config, CommandUtils.getCommands().get("/wand"));
-		CommandUtils.replaceCommand(wrapper.originalCmd, wrapper);
+	public static void inject(@NotNull Config config) {
+		Command original = CommandUtils.getCommands().get("/wand");
+		if (original == null) {
+			throw new IllegalStateException("WorldEdit command '/wand' not found — is WorldEdit loaded?");
+		}
+		WEWandCommandWrapper wrapper = new WEWandCommandWrapper(config, original);
+		CommandUtils.replaceCommand(original, wrapper);
 	}
 
 	public static void uninject() {
-		WEWandCommandWrapper wrapper = (WEWandCommandWrapper) CommandUtils.getCommands().get("/wand");
-		CommandUtils.replaceCommand(wrapper, wrapper.originalCmd);
+		Command current = CommandUtils.getCommands().get("/wand");
+		if (current instanceof WEWandCommandWrapper wrapper) {
+			CommandUtils.replaceCommand(wrapper, wrapper.originalCmd);
+		}
 	}
 
 	protected final Config config;
 	protected final Command originalCmd;
 
-	protected WEWandCommandWrapper(Config config, Command originalCmd) {
+	protected WEWandCommandWrapper(@NotNull Config config, @NotNull Command originalCmd) {
 		super(originalCmd.getName(), originalCmd.getDescription(), originalCmd.getUsage(), originalCmd.getAliases());
 		this.config = config;
 		this.originalCmd = originalCmd;
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String label, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
 		if (!config.extendedWorldEditWandEnabled) {
 			return originalCmd.execute(sender, label, args);
 		}
